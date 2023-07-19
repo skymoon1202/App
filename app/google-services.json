@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "691888558189",
+    "project_id": "driversupervisingsystem",
+    "storage_bucket": "driversupervisingsystem.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:691888558189:android:ebbb4c2b1ef13c7d5caf64",
+        "android_client_info": {
+          "package_name": "com.example.driversupervisingsystem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "691888558189-0h42t32daipgmnbhnebi5jo3qsqp436h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASNAw14YRzLpMrnAAADtfvX6yBLBaJ_D4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "691888558189-0h42t32daipgmnbhnebi5jo3qsqp436h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

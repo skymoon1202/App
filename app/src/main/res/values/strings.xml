@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Driver Supervising System</string>
+    <string name="Name">Name</string>
+    <string name="PasswordHint">8자 이상 입력</string>
+    <string name="Password">Password</string>
+    <string name="Email">Email Address</string>
+    <string name="confirm_password">Confirm password</string>
+</resources>

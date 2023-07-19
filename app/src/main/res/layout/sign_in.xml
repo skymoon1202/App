@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SignIn"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="@color/green1">
+
+    <ImageView
+        android:id="@+id/car_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/car_icon_alone"
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="30dp"/>
+
+    <TextView
+        android:id="@+id/btn_sign_in"
+        android:layout_width="match_parent"
+        android:layout_height="70sp"
+        android:text="SIGN IN"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/sign_in_background"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        ></TextView>
+
+    <TextView
+        android:id="@+id/btn_create_account_signin"
+        android:layout_width="match_parent"
+        android:layout_height="70sp"
+        android:text="CREATE ACCOUNT"
+        android:textSize="20sp"
+        android:textColor="@color/green2"
+        android:textStyle="bold"
+        android:background="@drawable/btn_stroke"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        ></TextView>
+
+
+
+
+
+</LinearLayout>
