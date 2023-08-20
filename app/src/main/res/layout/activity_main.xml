@@ -24,7 +24,8 @@
             android:padding="5dp"
             android:src="@drawable/white_settings_icon"
             android:scaleType="fitCenter"
-            android:background="@color/green4"/>
+            android:background="@color/green4"
+            android:contentDescription="driver's image" />
     </androidx.appcompat.widget.Toolbar>
 
 

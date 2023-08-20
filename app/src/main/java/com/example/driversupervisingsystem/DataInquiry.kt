@@ -1,6 +1,7 @@
 package com.example.driversupervisingsystem
 
 import android.content.ContentValues.TAG
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
@@ -8,6 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
@@ -19,6 +21,12 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import org.w3c.dom.Text
 import java.text.SimpleDateFormat
 import java.util.*
@@ -27,12 +35,14 @@ class DataInquiry : AppCompatActivity() {
 
     private var db = FirebaseFirestore.getInstance()
     private lateinit var tableLayout: TableLayout
+    val firebaseStorage = FirebaseStorage.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_data_inquiry)
 
         val tvName : TextView = findViewById(R.id.tv_username)
+        val ivDriverImage : ImageView = findViewById(R.id.iv_driver_image)
 
         val receivedName = intent.getStringExtra(MemberInformation.Name)
         val receivedEmail = intent.getStringExtra(MemberInformation.Email)
@@ -42,13 +52,17 @@ class DataInquiry : AppCompatActivity() {
         tableLayout = findViewById(R.id.tl_background)
 
         if (receivedEmail != null) {
-            fetchData(receivedEmail)
+            if (receivedName != null) {
+                fetchData(receivedEmail,ivDriverImage,firebaseStorage, receivedName)
+            }
         }else{
             Log.d(TAG,"There is no such email address")
         }
+
+
     }
 
-    private fun fetchData(userEmail: String) {
+    private fun fetchData(userEmail: String, imageView: ImageView, storage: FirebaseStorage, userName : String) {
         db.collection(userEmail)
             .orderBy("1") // 정렬 기준을 여기에 적용합니다.
             .get()
@@ -57,15 +71,15 @@ class DataInquiry : AppCompatActivity() {
                 querySnapshot.documents.forEach {
                     // 이미지 목록에서 정보를 조회합니다.
                     //val imageUrl = it.getString("1") ?: return@forEach
-                    val imageTime = it.getString("1")
+                    val imageUrl = it.getString("1")
 
                     val tableRow = TableRow(this)
                     val tvDate = TextView(this)
                     val tvOrder = TextView(this)
                     val tvTime = TextView(this)
 
-                    val imageTimeDay : String? = imageTime?.substring(6,13)
-                    val imageTimeType : String? = imageTime?.substring(15)
+                    val imageTimeDay : String? = imageUrl?.substring(0,7)
+                    val imageTimeType : String? = imageUrl?.substring(9,14)
 
                     val dateInputFormat = SimpleDateFormat("yyyyMMdd", Locale.KOREA)
                     val timeInputFormat = SimpleDateFormat("HHmmss",Locale.KOREA)
@@ -73,11 +87,11 @@ class DataInquiry : AppCompatActivity() {
                     val dateOutputFormat = SimpleDateFormat("yyyy/MM/dd", Locale.KOREA)
                     val timeOutputFormat = SimpleDateFormat("HH:mm:ss",Locale.KOREA)
 
-                    val date = dateInputFormat.parse(imageTimeDay)
-                    val time = timeInputFormat.parse(imageTimeType)
+                    val date = imageTimeDay?.let { it1 -> dateInputFormat.parse(it1) }
+                    val time = imageTimeType?.let { it1 -> timeInputFormat.parse(it1) }
 
-                    val resultDate = dateOutputFormat.format(date)
-                    val resultTime = timeOutputFormat.format(time)
+                    val resultDate = date?.let { it1 -> dateOutputFormat.format(it1) }
+                    val resultTime = time?.let { it1 -> timeOutputFormat.format(it1) }
 
                     tvDate.text = resultDate
                     tvOrder.text = "$order"
@@ -134,7 +148,9 @@ class DataInquiry : AppCompatActivity() {
                         50
                     )
                     tableRow.setOnClickListener {
-                        // 클릭 시 다운로드 또는 표시합니다.
+                        if (imageUrl != null) {
+                            loadImageFromFirebaseStorage(imageView, storage, imageUrl)
+                        }
                     }
 
                     tableLayout.addView(tableRow)
@@ -145,6 +161,25 @@ class DataInquiry : AppCompatActivity() {
                 // 에러 처리
             Log.e(TAG,"error")
             }
+    }
+
+    private fun loadImageFromFirebaseStorage(imageView: ImageView, storage: FirebaseStorage, imagePath: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val bitmap = downloadImageFromFirebase(storage, imagePath)
+            imageView.setImageBitmap(bitmap)
+        }
+    }
+
+    private suspend fun downloadImageFromFirebase(storage: FirebaseStorage, imagePath: String) = withContext(Dispatchers.IO) {
+        val imageRef = storage.reference.child(imagePath)
+        val maximumSize: Long = 10 * 1024 * 1024 // 최대 10MB 사이즈로 설정
+        try {
+            val imageBytes = imageRef.getBytes(maximumSize).await()
+            BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
 }
