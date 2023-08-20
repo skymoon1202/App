@@ -30,7 +30,7 @@ class EnteringAccount : AppCompatActivity() {
 
         btnEnter.setOnClickListener {
             if(etEmail.text.isEmpty() or etPassword.text.isEmpty()){
-                Toast.makeText(this, "Please Enter your address and password",Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "이메일과 비밀번호를 모두 입력해주세요",Toast.LENGTH_LONG).show()
             }else {
                 val txEmail : String = etEmail.text.toString()
                 val txPassword : String = etPassword.text.toString()
@@ -51,9 +51,11 @@ class EnteringAccount : AppCompatActivity() {
                             Log.d(TAG, "DocumentSnapshot data: ${document.data}")
                             val information = document.data
                             val dataName = information?.get("Name") as String
-                            intent.putExtra(MemberInformation.Name,dataName)
+                            val dataEmail = information["Email"] as String
                             val intent = Intent(this, MainActivity::class.java)
-                            intent.putExtra("key",dataName)
+                            intent.putExtra(MemberInformation.Name,dataName)
+                            intent.putExtra(MemberInformation.Email,dataEmail)
+                            //intent.putExtra("key",dataName)
                             startActivity(intent)
                             finish()
                         } else {

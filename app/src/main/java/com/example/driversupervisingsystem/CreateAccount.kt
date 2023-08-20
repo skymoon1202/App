@@ -31,7 +31,6 @@ class CreateAccount : AppCompatActivity() {
         val btnCreateAccount : Button = findViewById(R.id.btn_create_account)
         auth = Firebase.auth
 
-
         btnCreateAccount.setOnClickListener {
             when{
                 etEmailAddress.text.isEmpty() -> Toast.makeText(this, "Please enter your email address", Toast.LENGTH_LONG).show()
@@ -43,8 +42,8 @@ class CreateAccount : AppCompatActivity() {
                     val txPassword : String = etPassword.text.toString()
                     createAccount(txEmailAddress,txPassword)
                     createUserField(txEmailAddress, txName)
-                    val intent = Intent(this,MainActivity::class.java)
-                    intent.putExtra("key2",txName)
+                    val intent = Intent(this,EnteringAccount::class.java)
+                    //intent.putExtra("key2",txName)
                     startActivity(intent)
                     finish()
                 }else{
@@ -54,21 +53,21 @@ class CreateAccount : AppCompatActivity() {
         }
     }
 
-        private fun createAccount(EmailAddress: String, Password: String) {
-            auth?.createUserWithEmailAndPassword(EmailAddress,Password)?.addOnCompleteListener(this) {
+    private fun createAccount(EmailAddress: String, Password: String) {
+        auth?.createUserWithEmailAndPassword(EmailAddress,Password)?.addOnCompleteListener(this) {
                 task -> if (task.isSuccessful) {
-                    Toast.makeText(baseContext,"Successfully created",Toast.LENGTH_LONG).show()
-                }else{
-                    Toast.makeText(baseContext,"Something wrong",Toast.LENGTH_LONG).show()
-                }
-            }
+            Toast.makeText(baseContext,"Successfully created",Toast.LENGTH_LONG).show()
+        }else{
+            Toast.makeText(baseContext,"Something wrong",Toast.LENGTH_LONG).show()
         }
+        }
+    }
 
-        private fun createUserField(EmailAddress : String, Name : String) {
-            val dataToSave = hashMapOf("Email" to EmailAddress, "Name" to Name)
-            db.document(EmailAddress)
-                .set(dataToSave)
-                .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
-                .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
-        }
+    private fun createUserField(EmailAddress : String, Name : String) {
+        val dataToSave = hashMapOf("Email" to EmailAddress, "Name" to Name)
+        db.document(EmailAddress)
+            .set(dataToSave)
+            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
+            .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
+    }
     }
