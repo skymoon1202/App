@@ -35,7 +35,7 @@ class DataInquiry : AppCompatActivity() {
 
     private var db = FirebaseFirestore.getInstance()
     private lateinit var tableLayout: TableLayout
-    val firebaseStorage = FirebaseStorage.getInstance()
+    private val firebaseStorage = FirebaseStorage.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,15 +46,13 @@ class DataInquiry : AppCompatActivity() {
 
         val receivedName = intent.getStringExtra(MemberInformation.Name)
         val receivedEmail = intent.getStringExtra(MemberInformation.Email)
-        val titleText = "'s data"
+        val titleText = "님의 기록"
         tvName.text = receivedName.plus(titleText)
 
         tableLayout = findViewById(R.id.tl_background)
 
         if (receivedEmail != null) {
-            if (receivedName != null) {
-                fetchData(receivedEmail,ivDriverImage,firebaseStorage, receivedName)
-            }
+            fetchData(receivedEmail,ivDriverImage,firebaseStorage)
         }else{
             Log.d(TAG,"There is no such email address")
         }
@@ -62,15 +60,14 @@ class DataInquiry : AppCompatActivity() {
 
     }
 
-    private fun fetchData(userEmail: String, imageView: ImageView, storage: FirebaseStorage, userName : String) {
+    private fun fetchData(userEmail: String, imageView: ImageView, storage: FirebaseStorage) {
         db.collection(userEmail)
-            .orderBy("1") // 정렬 기준을 여기에 적용합니다.
+            .orderBy("1")
             .get()
             .addOnSuccessListener { querySnapshot ->
                 var order = 1
                 querySnapshot.documents.forEach {
-                    // 이미지 목록에서 정보를 조회합니다.
-                    //val imageUrl = it.getString("1") ?: return@forEach
+
                     val imageUrl = it.getString("1")
 
                     val tableRow = TableRow(this)
@@ -97,9 +94,9 @@ class DataInquiry : AppCompatActivity() {
                     tvOrder.text = "$order"
                     tvTime.text = resultTime
 
-                    tvDate.textSize = 14F
-                    tvOrder.textSize = 14F
-                    tvTime.textSize = 14F
+                    tvDate.textSize = 20F
+                    tvOrder.textSize = 20F
+                    tvTime.textSize = 20F
                     tvDate.gravity = Gravity.CENTER
                     tvOrder.gravity = Gravity.CENTER
                     tvTime.gravity = Gravity.CENTER
@@ -135,9 +132,9 @@ class DataInquiry : AppCompatActivity() {
                     marginTime.setMargins(2,2,2,1)
                     tvTime.layoutParams = marginTime
 
-                    tvDate.setPadding(2,2,2,2)
-                    tvOrder.setPadding(2,2,2,2)
-                    tvTime.setPadding(2,2,2,2)
+                    tvDate.setPadding(2,10,2,10)
+                    tvOrder.setPadding(2,10,2,10)
+                    tvTime.setPadding(2,10,2,10)
 
                     tableRow.addView(tvOrder)
                     tableRow.addView(tvDate)
@@ -149,7 +146,7 @@ class DataInquiry : AppCompatActivity() {
                     )
                     tableRow.setOnClickListener {
                         if (imageUrl != null) {
-                            loadImageFromFirebaseStorage(imageView, storage, imageUrl)
+                            loadImageFromFirebaseStorage(imageView, storage, imageUrl.plus(".jpg"))
                         }
                     }
 
@@ -159,7 +156,7 @@ class DataInquiry : AppCompatActivity() {
                 }
             }.addOnFailureListener {
                 // 에러 처리
-            Log.e(TAG,"error")
+                Log.e(TAG,"error")
             }
     }
 
@@ -181,5 +178,7 @@ class DataInquiry : AppCompatActivity() {
             null
         }
     }
+
+
 
 }

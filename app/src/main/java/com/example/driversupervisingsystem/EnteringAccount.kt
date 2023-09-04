@@ -48,21 +48,29 @@ class EnteringAccount : AppCompatActivity() {
                     val userRef = db.collection("member").document(email)
                     userRef.get().addOnSuccessListener {document ->
                         if (document != null) {
-                            Log.d(TAG, "DocumentSnapshot data: ${document.data}")
                             val information = document.data
                             val dataName = information?.get("Name") as String
                             val dataEmail = information["Email"] as String
-                            val intent = Intent(this, MainActivity::class.java)
-                            intent.putExtra(MemberInformation.Name,dataName)
-                            intent.putExtra(MemberInformation.Email,dataEmail)
-                            //intent.putExtra("key",dataName)
-                            startActivity(intent)
-                            finish()
+                            if(auth!!.currentUser?.isEmailVerified == true){
+                                val intent = Intent(this, MainActivity::class.java)
+                                intent.putExtra(MemberInformation.Name,dataName)
+                                intent.putExtra(MemberInformation.Email,dataEmail)
+                                startActivity(intent)
+                                finish()
+                            }else{
+                                val intent2 = Intent(this, EmailVerification::class.java)
+                                intent2.putExtra(MemberInformation.Name,dataName)
+                                intent2.putExtra(MemberInformation.Email,dataEmail)
+                                Log.d(TAG,"Current User : ${auth!!.currentUser}")
+                                startActivity(intent2)
+                                finish()
+                            }
+
                         } else {
                             Log.d(TAG, "No such document")
                         }
-                    }
-                    //goToMain(user)
+                        }
+
                 }else{
                     Toast.makeText(baseContext, "이메일과 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show()
                 }

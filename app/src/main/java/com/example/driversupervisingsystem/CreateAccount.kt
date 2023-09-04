@@ -10,6 +10,9 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -41,9 +44,20 @@ class CreateAccount : AppCompatActivity() {
                     val txName : String = etName.text.toString()
                     val txPassword : String = etPassword.text.toString()
                     createAccount(txEmailAddress,txPassword)
+                    val user = auth?.currentUser
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setDisplayName(txName)
+                        .build()
+                    user?.updateProfile(profileUpdates)
+                        ?.addOnCompleteListener { updateTask ->
+                            if (updateTask.isSuccessful) {
+                                Log.d(TAG, "DisplayName successfully written!: Name=$txName")
+                            } else {
+                                Log.e(TAG,"Error. ${updateTask.exception}")
+                            }
+                        }
                     createUserField(txEmailAddress, txName)
                     val intent = Intent(this,EnteringAccount::class.java)
-                    //intent.putExtra("key2",txName)
                     startActivity(intent)
                     finish()
                 }else{
@@ -56,6 +70,16 @@ class CreateAccount : AppCompatActivity() {
     private fun createAccount(EmailAddress: String, Password: String) {
         auth?.createUserWithEmailAndPassword(EmailAddress,Password)?.addOnCompleteListener(this) {
                 task -> if (task.isSuccessful) {
+            /*val user = auth?.currentUser
+            user?.sendEmailVerification()
+                ?.addOnCompleteListener { verificationTask ->
+                    if (verificationTask.isSuccessful) {
+                        Log.d(TAG,"Email successfully sent")
+                    } else {
+                        Log.e(TAG,"error: ${verificationTask.exception}")
+                    }
+                }*/
+
             Toast.makeText(baseContext,"Successfully created",Toast.LENGTH_LONG).show()
         }else{
             Toast.makeText(baseContext,"Something wrong",Toast.LENGTH_LONG).show()
@@ -63,6 +87,16 @@ class CreateAccount : AppCompatActivity() {
         }
     }
 
+    /*private fun emailVerification(user: FirebaseUser){
+        user.sendEmailVerification()
+            .addOnCompleteListener { verificationTask ->
+                if (verificationTask.isSuccessful) {
+                    Log.d(TAG,"Email successfully sent")
+                } else {
+                    Log.e(TAG,"error: ${verificationTask.exception}")
+                }
+            }
+    }*/
     private fun createUserField(EmailAddress : String, Name : String) {
         val dataToSave = hashMapOf("Email" to EmailAddress, "Name" to Name)
         db.document(EmailAddress)
@@ -70,4 +104,5 @@ class CreateAccount : AppCompatActivity() {
             .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
             .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
     }
+
     }
