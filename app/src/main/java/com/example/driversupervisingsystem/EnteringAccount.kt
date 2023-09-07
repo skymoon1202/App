@@ -31,7 +31,7 @@ class EnteringAccount : AppCompatActivity() {
         btnEnter.setOnClickListener {
             if(etEmail.text.isEmpty() or etPassword.text.isEmpty()){
                 Toast.makeText(this, "이메일과 비밀번호를 모두 입력해주세요",Toast.LENGTH_LONG).show()
-            }else {
+            }else{
                 val txEmail : String = etEmail.text.toString()
                 val txPassword : String = etPassword.text.toString()
                 signIn(txEmail,txPassword)
@@ -61,7 +61,7 @@ class EnteringAccount : AppCompatActivity() {
                                 val intent2 = Intent(this, EmailVerification::class.java)
                                 intent2.putExtra(MemberInformation.Name,dataName)
                                 intent2.putExtra(MemberInformation.Email,dataEmail)
-                                Log.d(TAG,"Current User : ${auth!!.currentUser}")
+                                Log.d(TAG,"Current User Name : $dataName")
                                 startActivity(intent2)
                                 finish()
                             }

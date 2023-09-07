@@ -1,9 +1,11 @@
 package com.example.driversupervisingsystem
 
 import android.app.Dialog
+import android.content.ContentValues
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.example.driversupervisingsystem.databinding.ActivityMainBinding
 
 
@@ -29,7 +31,9 @@ class MainActivity : AppCompatActivity() {
             onBackPressed()
 
         }
-        receivedName = intent.getStringExtra(MemberInformation.Name)
+        val txName = intent.getStringExtra(MemberInformation.Name)
+        Log.d(ContentValues.TAG,"Current User Name in MainActivity : $txName")
+        receivedName = txName
         receivedEmail = intent.getStringExtra(MemberInformation.Email)
         binding?.tvName?.text = receivedName
 

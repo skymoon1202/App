@@ -39,12 +39,13 @@ class CreateAccount : AppCompatActivity() {
                 etEmailAddress.text.isEmpty() -> Toast.makeText(this, "Please enter your email address", Toast.LENGTH_LONG).show()
                 etPassword.text.isEmpty() -> Toast.makeText(this, "Please enter your password", Toast.LENGTH_LONG).show()
                 etName.text.isEmpty() -> Toast.makeText(this, "Please enter your name", Toast.LENGTH_LONG).show()
+                etPassword.text.length < 8 -> Toast.makeText(this,"비밀번호는 8자 이상 입력해주세요",Toast.LENGTH_LONG).show()
                 else -> if(etPassword.text.toString() == etPassword2.text.toString()) {
                     val txEmailAddress: String = etEmailAddress.text.toString()
                     val txName : String = etName.text.toString()
                     val txPassword : String = etPassword.text.toString()
-                    createAccount(txEmailAddress,txPassword)
-                    val user = auth?.currentUser
+                    createAccount(txEmailAddress,txPassword, txName)
+                    /*val user = auth?.currentUser
                     val profileUpdates = UserProfileChangeRequest.Builder()
                         .setDisplayName(txName)
                         .build()
@@ -59,7 +60,7 @@ class CreateAccount : AppCompatActivity() {
                     createUserField(txEmailAddress, txName)
                     val intent = Intent(this,EnteringAccount::class.java)
                     startActivity(intent)
-                    finish()
+                    finish()*/
                 }else{
                     Toast.makeText(this, "Please confirm your password", Toast.LENGTH_LONG).show()
                 }
@@ -67,36 +68,20 @@ class CreateAccount : AppCompatActivity() {
         }
     }
 
-    private fun createAccount(EmailAddress: String, Password: String) {
-        auth?.createUserWithEmailAndPassword(EmailAddress,Password)?.addOnCompleteListener(this) {
-                task -> if (task.isSuccessful) {
-            /*val user = auth?.currentUser
-            user?.sendEmailVerification()
-                ?.addOnCompleteListener { verificationTask ->
-                    if (verificationTask.isSuccessful) {
-                        Log.d(TAG,"Email successfully sent")
-                    } else {
-                        Log.e(TAG,"error: ${verificationTask.exception}")
-                    }
-                }*/
-
+    private fun createAccount(EmailAddress: String, Password: String, Name: String) {
+        auth?.createUserWithEmailAndPassword(EmailAddress,Password)?.addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
             Toast.makeText(baseContext,"Successfully created",Toast.LENGTH_LONG).show()
-        }else{
+                createUserField(EmailAddress,Name)
+                val intent = Intent(this,EnteringAccount::class.java)
+                startActivity(intent)
+                finish()
+            }else{
             Toast.makeText(baseContext,"Something wrong",Toast.LENGTH_LONG).show()
-        }
+            }
         }
     }
 
-    /*private fun emailVerification(user: FirebaseUser){
-        user.sendEmailVerification()
-            .addOnCompleteListener { verificationTask ->
-                if (verificationTask.isSuccessful) {
-                    Log.d(TAG,"Email successfully sent")
-                } else {
-                    Log.e(TAG,"error: ${verificationTask.exception}")
-                }
-            }
-    }*/
     private fun createUserField(EmailAddress : String, Name : String) {
         val dataToSave = hashMapOf("Email" to EmailAddress, "Name" to Name)
         db.document(EmailAddress)
