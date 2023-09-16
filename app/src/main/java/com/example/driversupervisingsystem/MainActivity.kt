@@ -22,15 +22,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
-        if(supportActionBar != null){
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        }
-
-        setSupportActionBar(binding?.actionbarMain)
-        binding?.actionbarMain?.setNavigationOnClickListener {
-            onBackPressed()
-
-        }
         val txName = intent.getStringExtra(MemberInformation.Name)
         Log.d(ContentValues.TAG,"Current User Name in MainActivity : $txName")
         receivedName = txName
@@ -44,7 +35,12 @@ class MainActivity : AppCompatActivity() {
 
             startActivity(intent)
         }
-
+        binding?.btnDriveStart?.setOnClickListener {
+            val intent2 = Intent(this, DriveStart::class.java)
+            intent2.putExtra(MemberInformation.Name,receivedName)
+            intent2.putExtra(MemberInformation.Email,receivedEmail)
+            startActivity(intent2)
+        }
     }
 
     override fun onDestroy() {

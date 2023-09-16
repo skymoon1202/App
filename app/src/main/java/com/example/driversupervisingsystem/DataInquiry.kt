@@ -62,7 +62,7 @@ class DataInquiry : AppCompatActivity() {
 
     private fun fetchData(userEmail: String, imageView: ImageView, storage: FirebaseStorage) {
         db.collection(userEmail)
-            .orderBy("1")
+            .orderBy("url")
             .get()
             .addOnSuccessListener { querySnapshot ->
                 var order = 1

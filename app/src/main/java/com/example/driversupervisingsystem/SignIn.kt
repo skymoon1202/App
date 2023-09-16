@@ -16,11 +16,13 @@ class SignIn : AppCompatActivity() {
         tvSignIn.setOnClickListener {
             val intent = Intent(this, EnteringAccount::class.java)
             startActivity(intent)
+            finish()
         }
 
         tvCreateAccount.setOnClickListener {
             val intent2 = Intent(this, CreateAccount::class.java)
             startActivity(intent2)
+            finish()
         }
     }
 }
