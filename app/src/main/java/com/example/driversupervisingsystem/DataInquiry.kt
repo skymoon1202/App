@@ -64,117 +64,128 @@ class DataInquiry : AppCompatActivity() {
     }
 
     private fun fetchData(userEmail: String, imageView: ImageView, storage: FirebaseStorage) {
-        db.collection(userEmail)
-            .orderBy("url")
+        db.collection("Members").document(userEmail)
+            .collection("DrivingSessions")
             .get()
-            .addOnSuccessListener { querySnapshot ->
-                var order = 1
-                var position = 0
-                var selectedPosition : Int? = null
-                querySnapshot.documents.forEach {
+            .addOnSuccessListener { sessionSnapshot ->
+                for (sessionDocument in sessionSnapshot.documents) {
+                    val sessionId = sessionDocument.id
 
-                    val imageUrl = it.getString("url")
+                    db.collection("Members").document(userEmail)
+                        .collection("DrivingSessions").document(sessionId)
+                        .collection("DrowsinessEvents")
+                        .orderBy("url")
+                        .get()
+                        .addOnSuccessListener { eventSnapshot ->
+                            var order = 1
+                            var position = 0
+                            var selectedPosition : Int? = null
+                            eventSnapshot.documents.forEach {
 
-                    val tableRow = TableRow(this)
-                    val tvDate = TextView(this)
-                    val tvOrder = TextView(this)
-                    val tvTime = TextView(this)
+                                val imageUrl = it.getString("url")
 
-                    val imageTimeDay : String? = imageUrl?.substring(0,8)
-                    val imageTimeType : String? = imageUrl?.substring(9,15)
+                                val tableRow = TableRow(this)
+                                val tvDate = TextView(this)
+                                val tvOrder = TextView(this)
+                                val tvTime = TextView(this)
 
-                    val dateInputFormat = SimpleDateFormat("yyyyMMdd", Locale.KOREA)
-                    val timeInputFormat = SimpleDateFormat("HHmmss",Locale.KOREA)
+                                val imageTimeDay : String? = imageUrl?.substring(0,8)
+                                val imageTimeType : String? = imageUrl?.substring(9,15)
 
-                    val dateOutputFormat = SimpleDateFormat("yyyy/MM/dd", Locale.KOREA)
-                    val timeOutputFormat = SimpleDateFormat("HH:mm:ss",Locale.KOREA)
+                                val dateInputFormat = SimpleDateFormat("yyyyMMdd", Locale.KOREA)
+                                val timeInputFormat = SimpleDateFormat("HHmmss",Locale.KOREA)
 
-                    val date = imageTimeDay?.let { it1 -> dateInputFormat.parse(it1) }
-                    val time = imageTimeType?.let { it1 -> timeInputFormat.parse(it1) }
+                                val dateOutputFormat = SimpleDateFormat("yyyy/MM/dd", Locale.KOREA)
+                                val timeOutputFormat = SimpleDateFormat("HH:mm:ss",Locale.KOREA)
 
-                    val resultDate = date?.let { it1 -> dateOutputFormat.format(it1) }
-                    val resultTime = time?.let { it1 -> timeOutputFormat.format(it1) }
+                                val date = imageTimeDay?.let { it1 -> dateInputFormat.parse(it1) }
+                                val time = imageTimeType?.let { it1 -> timeInputFormat.parse(it1) }
 
-                    tvDate.text = resultDate
-                    tvOrder.text = "$order"
-                    tvTime.text = resultTime
+                                val resultDate = date?.let { it1 -> dateOutputFormat.format(it1) }
+                                val resultTime = time?.let { it1 -> timeOutputFormat.format(it1) }
 
-                    //val fixedOrder = tvOrder.text.toString().toInt()
+                                tvDate.text = resultDate
+                                tvOrder.text = "$order"
+                                tvTime.text = resultTime
 
-                    tvDate.textSize = 20F
-                    tvOrder.textSize = 20F
-                    tvTime.textSize = 20F
-                    tvDate.gravity = Gravity.CENTER
-                    tvOrder.gravity = Gravity.CENTER
-                    tvTime.gravity = Gravity.CENTER
-                    tvDate.setTextColor(Color.parseColor("#588157"))
-                    tvOrder.setTextColor(Color.parseColor("#588157"))
-                    tvTime.setTextColor(Color.parseColor("#588157"))
+                                //val fixedOrder = tvOrder.text.toString().toInt()
+
+                                tvDate.textSize = 20F
+                                tvOrder.textSize = 20F
+                                tvTime.textSize = 20F
+                                tvDate.gravity = Gravity.CENTER
+                                tvOrder.gravity = Gravity.CENTER
+                                tvTime.gravity = Gravity.CENTER
+                                tvDate.setTextColor(Color.parseColor("#588157"))
+                                tvOrder.setTextColor(Color.parseColor("#588157"))
+                                tvTime.setTextColor(Color.parseColor("#588157"))
 
 
-                    //val background = GradientDrawable()
-                    //background.setColor(ContextCompat.getColor(this, R.color.white))
-                    tvDate.setBackgroundColor(Color.parseColor("#FFFFFF"))
-                    tvOrder.setBackgroundColor(Color.parseColor("#FFFFFF"))
-                    tvTime.setBackgroundColor(Color.parseColor("#FFFFFF"))
-                    //defaultRow(tvOrder,tvDate,tvTime)
+                                //val background = GradientDrawable()
+                                //background.setColor(ContextCompat.getColor(this, R.color.white))
+                                tvDate.setBackgroundColor(Color.parseColor("#FFFFFF"))
+                                tvOrder.setBackgroundColor(Color.parseColor("#FFFFFF"))
+                                tvTime.setBackgroundColor(Color.parseColor("#FFFFFF"))
+                                //defaultRow(tvOrder,tvDate,tvTime)
 
-                    val marginDate = TableRow.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                    )
-                    marginDate.setMargins(2,2,2,1) // 원하는 마진 값으로 변경(예시: 16 dp)
-                    tvDate.layoutParams = marginDate
-
-                    val marginOrder = TableRow.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
-                    marginOrder.setMargins(2,2,2,1)
-                    tvOrder.layoutParams = marginOrder
-
-                    val marginTime = TableRow.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
-                    marginTime.setMargins(2,2,2,1)
-                    tvTime.layoutParams = marginTime
-
-                    tvDate.setPadding(2,10,2,10)
-                    tvOrder.setPadding(2,10,2,10)
-                    tvTime.setPadding(2,10,2,10)
-
-                    tableRow.addView(tvOrder)
-                    tableRow.addView(tvDate)
-                    tableRow.addView(tvTime)
-
-                    tableRow.layoutParams = TableRow.LayoutParams(
-                        TableRow.LayoutParams.WRAP_CONTENT,
-                        50
-                    )
-                    tableRow.setOnClickListener {
-                        position = tableLayout.indexOfChild(tableRow)
-                        selectedRow(tvOrder, tvDate, tvTime)
-                        if (selectedPosition != null) {
-                            val previousSelectedRow = tableLayout.getChildAt(selectedPosition!!) as? TableRow
-                            if (previousSelectedRow != null) {
-                                defaultRow(
-                                    previousSelectedRow.getChildAt(0) as TextView,
-                                    previousSelectedRow.getChildAt(1) as TextView,
-                                    previousSelectedRow.getChildAt(2) as TextView
+                                val marginDate = TableRow.LayoutParams(
+                                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT,
                                 )
+                                marginDate.setMargins(2,2,2,1) // 원하는 마진 값으로 변경(예시: 16 dp)
+                                tvDate.layoutParams = marginDate
+
+                                val marginOrder = TableRow.LayoutParams(
+                                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT
+                                )
+                                marginOrder.setMargins(2,2,2,1)
+                                tvOrder.layoutParams = marginOrder
+
+                                val marginTime = TableRow.LayoutParams(
+                                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT
+                                )
+                                marginTime.setMargins(2,2,2,1)
+                                tvTime.layoutParams = marginTime
+
+                                tvDate.setPadding(2,10,2,10)
+                                tvOrder.setPadding(2,10,2,10)
+                                tvTime.setPadding(2,10,2,10)
+
+                                tableRow.addView(tvOrder)
+                                tableRow.addView(tvDate)
+                                tableRow.addView(tvTime)
+
+                                tableRow.layoutParams = TableRow.LayoutParams(
+                                    TableRow.LayoutParams.WRAP_CONTENT,
+                                    50
+                                )
+                                tableRow.setOnClickListener {
+                                    position = tableLayout.indexOfChild(tableRow)
+                                    selectedRow(tvOrder, tvDate, tvTime)
+                                    if (selectedPosition != null) {
+                                        val previousSelectedRow = tableLayout.getChildAt(selectedPosition!!) as? TableRow
+                                        if (previousSelectedRow != null) {
+                                            defaultRow(
+                                                previousSelectedRow.getChildAt(0) as TextView,
+                                                previousSelectedRow.getChildAt(1) as TextView,
+                                                previousSelectedRow.getChildAt(2) as TextView
+                                            )
+                                        }
+                                    }
+                                    Log.d(TAG,"Current : $position, Previous : $selectedPosition")
+                                    selectedPosition = position
+                                    if (imageUrl != null) {
+                                        loadImageFromFirebaseStorage(imageView, storage, imageUrl)
+                                    }
+                                }
+
+                                tableLayout.addView(tableRow)
+
+                                order++
                             }
                         }
-                        Log.d(TAG,"Current : $position, Previous : $selectedPosition")
-                        selectedPosition = position
-                        if (imageUrl != null) {
-                            loadImageFromFirebaseStorage(imageView, storage, imageUrl)
-                        }
-                    }
-
-                    tableLayout.addView(tableRow)
-
-                    order++
                 }
             }.addOnFailureListener {
                 // 에러 처리

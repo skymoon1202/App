@@ -45,7 +45,7 @@ class EnteringAccount : AppCompatActivity() {
             ?.addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(baseContext, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show()
-                    val userRef = db.collection("member").document(email)
+                    val userRef = db.collection("Members").document(email)
                     userRef.get().addOnSuccessListener {document ->
                         if (document != null) {
                             val information = document.data
