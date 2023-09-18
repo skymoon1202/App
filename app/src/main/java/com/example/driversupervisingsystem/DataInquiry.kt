@@ -3,11 +3,14 @@ package com.example.driversupervisingsystem
 import android.content.ContentValues.TAG
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Typeface
 import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TableLayout
@@ -66,17 +69,19 @@ class DataInquiry : AppCompatActivity() {
             .get()
             .addOnSuccessListener { querySnapshot ->
                 var order = 1
+                var position = 0
+                var selectedPosition : Int? = null
                 querySnapshot.documents.forEach {
 
-                    val imageUrl = it.getString("1")
+                    val imageUrl = it.getString("url")
 
                     val tableRow = TableRow(this)
                     val tvDate = TextView(this)
                     val tvOrder = TextView(this)
                     val tvTime = TextView(this)
 
-                    val imageTimeDay : String? = imageUrl?.substring(0,7)
-                    val imageTimeType : String? = imageUrl?.substring(9,14)
+                    val imageTimeDay : String? = imageUrl?.substring(0,8)
+                    val imageTimeType : String? = imageUrl?.substring(9,15)
 
                     val dateInputFormat = SimpleDateFormat("yyyyMMdd", Locale.KOREA)
                     val timeInputFormat = SimpleDateFormat("HHmmss",Locale.KOREA)
@@ -94,6 +99,8 @@ class DataInquiry : AppCompatActivity() {
                     tvOrder.text = "$order"
                     tvTime.text = resultTime
 
+                    //val fixedOrder = tvOrder.text.toString().toInt()
+
                     tvDate.textSize = 20F
                     tvOrder.textSize = 20F
                     tvTime.textSize = 20F
@@ -110,6 +117,7 @@ class DataInquiry : AppCompatActivity() {
                     tvDate.setBackgroundColor(Color.parseColor("#FFFFFF"))
                     tvOrder.setBackgroundColor(Color.parseColor("#FFFFFF"))
                     tvTime.setBackgroundColor(Color.parseColor("#FFFFFF"))
+                    //defaultRow(tvOrder,tvDate,tvTime)
 
                     val marginDate = TableRow.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -145,8 +153,22 @@ class DataInquiry : AppCompatActivity() {
                         50
                     )
                     tableRow.setOnClickListener {
+                        position = tableLayout.indexOfChild(tableRow)
+                        selectedRow(tvOrder, tvDate, tvTime)
+                        if (selectedPosition != null) {
+                            val previousSelectedRow = tableLayout.getChildAt(selectedPosition!!) as? TableRow
+                            if (previousSelectedRow != null) {
+                                defaultRow(
+                                    previousSelectedRow.getChildAt(0) as TextView,
+                                    previousSelectedRow.getChildAt(1) as TextView,
+                                    previousSelectedRow.getChildAt(2) as TextView
+                                )
+                            }
+                        }
+                        Log.d(TAG,"Current : $position, Previous : $selectedPosition")
+                        selectedPosition = position
                         if (imageUrl != null) {
-                            loadImageFromFirebaseStorage(imageView, storage, imageUrl.plus(".jpg"))
+                            loadImageFromFirebaseStorage(imageView, storage, imageUrl)
                         }
                     }
 
@@ -179,6 +201,26 @@ class DataInquiry : AppCompatActivity() {
         }
     }
 
-
-
+    private fun selectedRow (tvOrder : TextView, tvDate : TextView, tvTime : TextView){
+        tvOrder.setTextColor(Color.parseColor("#FFFFFFFF"))
+        tvDate.setTextColor(Color.parseColor("#FFFFFFFF"))
+        tvTime.setTextColor(Color.parseColor("#FFFFFFFF"))
+        tvOrder.setTypeface(tvOrder.typeface, Typeface.BOLD)
+        tvTime.setTypeface(tvTime.typeface, Typeface.BOLD)
+        tvDate.setTypeface(tvDate.typeface, Typeface.BOLD)
+        tvOrder.setBackgroundColor(Color.parseColor("#FF3700B3"))
+        tvDate.setBackgroundColor(Color.parseColor("#FF3700B3"))
+        tvTime.setBackgroundColor(Color.parseColor("#FF3700B3"))
+    }
+    private fun defaultRow (tvOrder : TextView, tvDate : TextView, tvTime : TextView){
+        tvDate.setTextColor(Color.parseColor("#588157"))
+        tvOrder.setTextColor(Color.parseColor("#588157"))
+        tvTime.setTextColor(Color.parseColor("#588157"))
+        tvOrder.setTypeface(tvOrder.typeface, Typeface.NORMAL)
+        tvTime.setTypeface(tvTime.typeface, Typeface.NORMAL)
+        tvDate.setTypeface(tvDate.typeface, Typeface.NORMAL)
+        tvOrder.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
+        tvDate.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
+        tvTime.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
+    }
 }
